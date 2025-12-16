@@ -1,6 +1,6 @@
 site_name: Document Hosting
 site_description: Documentation for the Document Hosting project
-site_url: https://tm8619.github.io/document-hosting
+site_url: https://your-project.pages.dev # Cloudflare PagesのURLに変更してください
 
 nav:
   - Home: index.md
