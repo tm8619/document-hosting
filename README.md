@@ -40,53 +40,142 @@ mkdocs build
 
 ### 方法 1: GitHub リポジトリと連携（推奨）
 
-1. **GitHub にプッシュ**
-
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
-
-2. **Cloudflare Pages でプロジェクト作成**
-
-   - [Cloudflare Dashboard](https://dash.cloudflare.com/)にログイン
-   - `Workers & Pages` → `Create application` → `Pages` → `Connect to Git`
-   - GitHub リポジトリを選択
-
-3. **ビルド設定**
-
-   - **Build command**: `pip install -r requirements.txt && mkdocs build`
-   - **Build output directory**: `site`
-   - **Environment variables** (必要に応じて):
-     - `PYTHON_VERSION`: `3.11`
-
-4. **デプロイ**
-
-   - `Save and Deploy` をクリック
-   - 自動的にビルドとデプロイが開始されます
-
-5. **自動デプロイ**
-   - 以降、`main` ブランチへのプッシュで自動デプロイされます
-
-### 方法 2: Wrangler を使用（CLI）
+#### ステップ 1: GitHub にプッシュ
 
 ```bash
-# Wranglerのインストール
-npm install -g wrangler
-
-# ビルド
-mkdocs build
-
-# デプロイ
-npx wrangler pages deploy site --project-name=your-project-name
+git add .
+git commit -m "Initial commit"
+git push origin main
 ```
 
-### 方法 3: 手動アップロード
+#### ステップ 2: Cloudflare Pages でプロジェクト作成
 
-1. `mkdocs build` でサイトをビルド
-2. Cloudflare Dashboard で `Workers & Pages` → `Create application` → `Pages` → `Upload assets`
-3. `site/` フォルダの内容をアップロード
+1. [Cloudflare Dashboard](https://dash.cloudflare.com/) にログイン
+2. 左サイドバーから **Workers & Pages** をクリック
+3. 右上の **Create application** ボタンをクリック
+4. **Pages** タブを選択
+5. **Connect to Git** をクリック
+
+#### ステップ 3: リポジトリの選択
+
+1. **GitHub** を選択（初回は GitHub との連携を許可）
+2. リポジトリ一覧から `document-hosting` を選択
+3. **Begin setup** をクリック
+
+#### ステップ 4: ビルド設定（重要！）
+
+**Set up builds and deployments** 画面で以下を入力：
+
+| 項目                       | 値                                                |
+| -------------------------- | ------------------------------------------------- |
+| **Project name**           | `document-hosting`（任意の名前）                  |
+| **Production branch**      | `main`                                            |
+| **Build command**          | `pip install -r requirements.txt && mkdocs build` |
+| **Build output directory** | `site` ← ここに `site` と入力！                   |
+
+**Environment variables (optional)** セクションで変数を追加（推奨）：
+
+- **Variable name**: `PYTHON_VERSION`
+- **Value**: `3.11`
+
+#### ステップ 5: デプロイ
+
+1. **Save and Deploy** ボタンをクリック
+2. ビルドが自動的に開始されます（数分かかります）
+3. 完了すると `https://document-hosting-xxx.pages.dev` のような URL が発行されます
+
+#### ステップ 6: 以降の更新
+
+コードを更新して `main` ブランチにプッシュすると、自動的に再デプロイされます：
+
+```bash
+git add .
+git commit -m "Update documentation"
+git push origin main
+```
+
+---
+
+### 方法 2: Wrangler CLI を使用（直接デプロイ）
+
+Git を使わず、ローカルから直接デプロイする方法です。
+
+#### ステップ 1: 準備
+
+```bash
+# Node.js がインストールされていることを確認
+node --version
+
+# Wrangler をインストール（グローバル）
+npm install -g wrangler
+
+# Cloudflare にログイン
+wrangler login
+```
+
+ブラウザが開くので、Cloudflare アカウントでログインして認証してください。
+
+#### ステップ 2: ビルド
+
+```bash
+# MkDocs でサイトをビルド
+mkdocs build
+```
+
+`site/` ディレクトリに HTML ファイルが生成されます。
+
+#### ステップ 3: デプロイ
+
+```bash
+# プロジェクト名を指定してデプロイ（初回）
+npx wrangler pages deploy site --project-name=document-hosting
+```
+
+**重要**:
+
+- `site` はデプロイするディレクトリ名（mkdocs が生成したフォルダ）
+- `--project-name=document-hosting` は Cloudflare 上のプロジェクト名（任意）
+
+初回実行時に確認メッセージが表示されたら `y` を入力してください。
+
+#### ステップ 4: 以降の更新
+
+```bash
+# ビルドしてデプロイ（1コマンドで）
+mkdocs build && npx wrangler pages deploy site --project-name=document-hosting
+```
+
+---
+
+### 方法 3: 手動アップロード（Git や CLI を使わない）
+
+#### ステップ 1: ビルド
+
+```bash
+mkdocs build
+```
+
+#### ステップ 2: アップロード
+
+1. [Cloudflare Dashboard](https://dash.cloudflare.com/) にログイン
+2. **Workers & Pages** → **Create application**
+3. **Pages** タブ → **Upload assets** を選択
+4. プロジェクト名を入力（例: `document-hosting`）
+5. `site/` フォルダ内のファイルをドラッグ&ドロップ
+   - **注意**: `site` フォルダそのものではなく、`site` の中身をアップロード
+6. **Deploy site** をクリック
+
+---
+
+## デプロイの確認
+
+デプロイが完了すると、以下のような URL が発行されます：
+
+```
+https://document-hosting-xxx.pages.dev
+```
+
+ブラウザでアクセスして、サイトが表示されることを確認してください。
 
 ## カスタムドメインの設定
 
